@@ -49,7 +49,7 @@ class User:
             return
         self.customer_id = response.json()["objectCreated"]["_id"]
         
-        # Create a Checkings Account
+        # Create a Checking Account
         url = f'http://api.nessieisreal.com/customers/{self.customer_id}/accounts?key={api_key}'
         payload = {
             "type": "Checking",
