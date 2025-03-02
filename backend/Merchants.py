@@ -62,3 +62,7 @@ class Merchant:
             print('ERROR: ', response.json())
             return
         return response.json()
+    
+    def get_merchant_id(self):
+        # Return the merchant ID
+        return self.merchant_id
