@@ -18,6 +18,13 @@ def get_merchants():
         return
     return response.json()
 
+def lookup_merchant(merchant_id):
+    merchants = get_merchants()
+    for merchant in merchants:
+        if merchant['_id'] == merchant_id:
+            return merchant
+    return None
+
 """
 Defines a Merchant class which represents a merchant in the database.
 Each merchant has a name, category, and address.
