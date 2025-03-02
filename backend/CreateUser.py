@@ -29,4 +29,10 @@ def create_user():
         return jsonify({"success": False, "message": "Invalid balance format. Must be a number!"}), 400
     user = Users.User(username, firstname, lastname, password, address, balance)
     USERS_DATABASE[username] = user
-    return jsonify({"success": True, "message": "Account created successfully!"}), 201
+    return jsonify({
+            "success": True,
+            "message": "Accounted created successfully!!",
+            "user": {
+                "username": username
+            }
+        }), 201
