@@ -23,6 +23,8 @@ class User:
         self.lastname = lastname.upper()  # String :: Last name of user
         self.password = password  # String :: Password of user
         street_number, street_name, city, state, zip_code = address  # List[String] :: Address of user
+        self.group_ids = set()
+        self.num_purchases = 0
         
         # Create a Customer
         url = f"http://api.nessieisreal.com/customers?key={api_key}"
@@ -50,7 +52,7 @@ class User:
         # Create a Checkings Account
         url = f'http://api.nessieisreal.com/customers/{self.customer_id}/accounts?key={api_key}'
         payload = {
-            "type": "Checkings",
+            "type": "Checking",
             "nickname": self.firstname + self.lastname + "AccountAbility",
             "rewards": 0,
             "balance": balance,  # Float :: Initial balance of account
@@ -60,10 +62,16 @@ class User:
             data=json.dumps(payload),
             headers={'content-type':'application/json'},
             )
+        if response.status_code != 201:
+            print('ERROR: ', response.json())
+            return
+        self.primary_account_id = response.json()["objectCreated"]["_id"]
     
-    def make_purchase(self, amount, merchant_id):
+    def make_purchase(self, amount, merchant_id, account_id=None):
         # Make a purchase of "amount" at the provided merchant_id
-        url = f'http://api.nessieisreal.com/accounts/{self.customer_id}/purchases?key={api_key}'
+        if account_id is None:
+            account_id = self.primary_account_id
+        url = f'http://api.nessieisreal.com/accounts/{account_id}/purchases?key={api_key}'
         payload = {
             "merchant_id": merchant_id,
             "medium": "balance",
@@ -80,11 +88,14 @@ class User:
         if response.status_code != 201:
             print('ERROR: ', response.json())
             return response.status_code
+        self.num_purchases += 1
         return response.status_code
     
-    def get_purchases(self):
+    def get_purchases(self, account_id=None):
         # Get all purchases made by the user
-        url = f'http://api.nessieisreal.com/accounts/{self.customer_id}/purchases?key={api_key}'
+        if account_id is None:
+            account_id = self.primary_account_id
+        url = f'http://api.nessieisreal.com/accounts/{account_id}/purchases?key={api_key}'
         response = requests.get( 
             url, 
             headers={'content-type':'application/json'},
@@ -136,3 +147,19 @@ class User:
             print('ERROR: ', response.json())
             return response.status_code
         return response.status_code
+    
+    def add_group_id(self, group_id):
+        # Add a group_id to the user's set of group_ids
+        self.group_ids.add(group_id)
+    
+    def remove_group_id(self, group_id):
+        # Remove a group_id from the user's set of group_ids
+        self.group_ids.remove(group_id)
+    
+    def get_group_ids(self):
+        # Return the user's set of group_ids
+        return self.group_ids
+    
+    def get_num_purchases(self):
+        # Return the number of purchases made by a user
+        return self.num_purchases
