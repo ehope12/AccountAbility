@@ -24,6 +24,7 @@ class User:
         self.password = password  # String :: Password of user
         street_number, street_name, city, state, zip_code = address  # List[String] :: Address of user
         self.group_ids = set()
+        self.balance = balance
         self.num_purchases = 0
         
         # Create a Customer
@@ -71,25 +72,52 @@ class User:
         # Make a purchase of "amount" at the provided merchant_id
         if account_id is None:
             account_id = self.primary_account_id
+            
+        # POST purchase data
         url = f'http://api.nessieisreal.com/accounts/{account_id}/purchases?key={api_key}'
         payload = {
             "merchant_id": merchant_id,
             "medium": "balance",
-            "purchase_date": str(date.today()),
+            "purchase_date": "2025-03-02",
             "amount": amount,
             "status": "completed",
             "description": "string"
         }
-        response = requests.post( 
+        response1 = requests.post( 
             url, 
             data=json.dumps(payload),
             headers={'content-type':'application/json'},
             )
-        if response.status_code != 201:
-            print('ERROR: ', response.json())
-            return response.status_code
+        if response1.status_code != 201:
+            print('ERROR1: ', response1.json())
+            return response1.status_code
+        
+        # # GET account data
+        # url = f'http://api.nessieisreal.com/accounts/{account_id}?key={api_key}'
+        # response2 = requests.get( 
+        #     url,
+        #     headers={'content-type':'application/json'},
+        #     )
+        # if response2.status_code != 200:
+        #     print('ERROR2: ', response2.json())
+        #     return response2.status_code
+        
+        # # PUT account data
+        # payload = response2.json()
+        # payload['balance'] -= amount
+        # print(payload)
+        # response3 = requests.put( 
+        #     url, 
+        #     data=json.dumps(payload),
+        #     headers={'content-type':'application/json'},
+        #     )
+        # if response3.status_code != 202:
+        #     print('ERROR3: ', response3.json())
+        #     return response3.status_code
+        
+        self.balance -= amount
         self.num_purchases += 1
-        return response.status_code
+        return
     
     def get_purchases(self, account_id=None):
         # Get all purchases made by the user
