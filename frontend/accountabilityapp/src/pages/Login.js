@@ -1,14 +1,37 @@
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../UserContext";
 
 function Login() {
+    const { setUser } = useUser();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState(null);
+    const navigate = useNavigate();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        // Handle login logic here
-        console.log('Logging in with:', username, password);
+        setErrorMessage(null);
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/loginuser/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                setUser(result.user);
+                navigate('/account');
+            } else {
+                setErrorMessage(result.message);
+            }
+        } catch (error) {
+            setErrorMessage("Something went wrong. Please try again.");
+        }
     };
 
     return (

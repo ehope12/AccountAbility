@@ -1,7 +1,18 @@
-import React, { useState } from 'react';
+import React from "react";
+import { useUser } from "../UserContext";
 
 function Account() {
-    return <h1>Welcome, user</h1>;
+    const { user } = useUser();
+
+    if (!user) {
+        return <p>No user logged in. Please log in first.</p>;
+    }
+
+    return (
+        <div>
+            <h1>Welcome, {user.username}!</h1>
+        </div>
+    );
 }
 
 export default Account;

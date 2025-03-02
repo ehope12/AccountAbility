@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../UserContext";
 import './CreateAccount.css';
 
 function CreateAccount() {
+    const { setUser } = useUser();
+    const navigate = useNavigate();
     const [firstname, setFirstname] = useState('');
     const [lastname, setLastname] = useState('');
     const [streetnumber, setStreetnumber] = useState('');
@@ -19,7 +23,6 @@ function CreateAccount() {
         event.preventDefault();
         setErrorMessage(null);
         setSuccessMessage(null);
-        // Handle user creation logic here
         console.log('Signing up with:', firstname, lastname, streetnumber, streetname, city, state, zipcode, balance, username, password);
         const userData = {
             firstname,
@@ -40,6 +43,8 @@ function CreateAccount() {
 
             if (response.ok) {
                 setSuccessMessage(result.message);
+                setUser(result.user);
+                navigate('/account');
             } else {
                 setErrorMessage(result.message);
             }

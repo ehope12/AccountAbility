@@ -5,9 +5,11 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import CreateAccount from './pages/CreateAccount';
 import Account from "./pages/Account";
+import { UserProvider } from "./UserContext"; 
 
 function App() {
   return (
+    <UserProvider>
       <Router>
           <Routes>
               <Route path="/" element={<Login />} />
@@ -15,6 +17,7 @@ function App() {
               <Route path="/account" element={<Account />} />
           </Routes>
       </Router>
+    </UserProvider>
   );
 }
 
