@@ -16,6 +16,8 @@ def create_user():
     lastname = request.json['lastname']
     password = request.json['password']
     address = request.json['address']
+    if firstname == "" or lastname == "" or password == "" or len(address) != 5:
+        return jsonify({"success": False, "message": "Missing required fields!"}), 400
     if len(address[3]) != 2:
         return jsonify({"success": False, "message": "Invalid state abbreviation!"}), 400
     if len(address[4]) != 5:

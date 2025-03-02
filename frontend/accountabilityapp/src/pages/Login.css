@@ -1,0 +1,133 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin: 50px auto;
+    max-width: 1000px;
+  }
+  
+  .container {
+    flex: 1;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    min-width: 350px;
+    max-width: 450px;
+  }
+  
+  @media (max-width: 900px) {
+    .login-container {
+      flex-direction: column;
+      gap: 20px;
+    }
+  
+    .container {
+      width: 90%;
+      max-width: 400px;
+    }
+  }
+  
+  /* Title */
+  .title {
+    text-align: center;
+    font-size: 26px;
+    color: #004481;
+    margin-bottom: 20px;
+  }
+
+  /* Bigger Title */
+  .title2 {
+    text-align: center;
+    font-size: 36px;
+    color: #004481;
+  }
+  
+  /* Form Styling */
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Form Groups */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 0;
+  }
+  
+  .form-group label {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .form-group input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    width: 100%;
+    transition: border-color 0.3s ease-in-out;
+  }
+  
+  .form-group input:focus {
+    border-color: #004481;
+    outline: none;
+  }
+  
+  /* Button */
+  .button {
+    background-color: #004481;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 6px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .button:hover {
+    background-color: #002b5c;
+  }
+    .button2 {
+        background-color: #d03027;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 6px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .button2:hover {
+        background-color: #b02822;
+    }
+  
+  
+  /* Messages */
+  .error-message,
+  .success-message {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .error-message {
+    color: red;
+    margin-top: 10px;
+  }
+  
+  .success-message {
+    color: green;
+    margin-top: 10px;
+  }
+  
