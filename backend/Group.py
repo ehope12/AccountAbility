@@ -1,13 +1,8 @@
 # Group.py
 
+from Users import User    
+from Merchants import lookup_merchant
 
-# temporary for testing
-class User():
-    def __init__(self, username, password, account_id):
-        self.username = username
-        self.password = password
-        self.account_id = account_id
-        
 
 class Commitment():
     def __init__(self, pot_share=0, spend_limit=0, merchants=[], categories=[]):
@@ -15,12 +10,32 @@ class Commitment():
         self.spend_limit = spend_limit # Spending limit
         self.merchants = set(merchants) # Merchants to track
         self.categories = set(categories) # Categories to track
-        self.status = True
         
-    # def __str__(self):
-    #     return f"Commitment(pot_share={self.pot_share}, spend_limit={self.spend_limit}, merchants={self.merchants}, categories={self.categories})"
+        self.amount = 0
+        self.status = True
     
-    def update(self, pot_share=None, spend_limit=None, merchants=None, categories=None):
+    def getPotShare(self):
+        return self.pot_share
+    
+    def getSpendLimit(self):
+        return self.spend_limit
+    
+    def getMerchants(self):
+        return self.merchants
+    
+    def getCategories(self):
+        return self.categories
+
+    def getStatus(self):
+        return self.status
+    
+    def addSpending(self, amount):
+        self.amount += amount
+        if self.amount > self.spend_limit:
+            self.status = False
+    
+    def updateInfo(self, pot_share=None, spend_limit=None, merchants=None, categories=None):
+        # Update commitment info
         if pot_share:
             self.pot_share = pot_share
         if spend_limit:
@@ -29,7 +44,7 @@ class Commitment():
             self.merchants = set(merchants)
         if categories:
             self.categories = set(categories)
-        
+   
 
 class Group():
     curr_name_ids = {}
@@ -51,20 +66,26 @@ class Group():
             return
         self.users[user.username] = user
         self.commitments[user.username] = Commitment()
+        
+    def removeUser(self, username):
+        return 
     
-    def updateCommitment(self, username, pot_share=None, spend_limit=None, merchants=None, categories=None):
-        self.commitments[username].update(pot_share, spend_limit, merchants, categories)
+    def updateCommitmentInfo(self, username, pot_share=None, spend_limit=None, merchants=None, categories=None):
+        self.commitments[username].updateInfo(pot_share, spend_limit, merchants, categories)
         if pot_share:
-            self.updatePot()
-    
-    def updatePot(self):
-        self.pot = sum([c.pot_share for c in self.commitments.values()])
+            self.pot = sum([c.pot_share for c in self.commitments.values()])
         
     def updateCommitmentStatus(self, username):
-        # This should check User object for conflicts with commitment
-        return
+        purchases = self.users[username].get_purchases()
         
-    def areCommitmentsValid(self) -> bool:
+        user_categories_set = set(self.commitments[username].getCategories())
+        user_merchants = self.commitments[username].getMerchants()
+        for p in purchases:
+            merchant = lookup_merchant(p['merchant_id'])
+            if len(set(merchant['category']).intersection(user_categories_set)) > 0 or merchant['name'] in user_merchants:
+                self.commitments[username].addSpending(p['amount'])
+        
+    def hasValidCommitments(self) -> bool:
         for u, cmt in self.commitments.items():
             if cmt.pot_share <= 0 or cmt.spend_limit <= 0 or (len(cmt.merchants) == 0 and len(cmt.categories) == 0):
                 return False
@@ -72,10 +93,10 @@ class Group():
 
 
 def main():
-    user1 = User('Emily', 'helloo', 'a')
-    user2 = User('Adam', 'hiiii', 'b')
-    user3 = User('Aditi', 'haiiii', 'c')
-    user4 = User('David', 'hey.', 'd')
+    user1 = User('Emily', 'helloo', 'a', 'abcd', ('1','a','c','il','60606'), 1000000)
+    user2 = User('Adam', 'hiiii', 'b', 'abcd', ('2','a','c','il','60606'), 1000)
+    user3 = User('Aditi', 'haiiii', 'c', 'abcd', ('3','a','c','il','60606'), 15000000)
+    user4 = User('David', 'hey.', 'd', 'abcd', ('4','a','c','il','60606'), 360)
     
     group1 = Group('squad')
     group1.addUser(user1)
@@ -83,17 +104,14 @@ def main():
     group1.addUser(user3)
     group1.addUser(user4)
     
-    group1.updateCommitment('Emily', pot_share=20, spend_limit=50, merchants=['Starbucks', 'Yummy Future'])
-    group1.updateCommitment('Adam', pot_share=30, spend_limit=100, categories=['Restaurants'])
-    group1.updateCommitment('Aditi', pot_share=100, spend_limit=1500, merchants=['TikTok Shop'])
-    group1.updateCommitment('David', pot_share=10, spend_limit=200)
+    group1.updateCommitmentInfo('Emily', pot_share=20, spend_limit=50, merchants=['Starbucks', 'Yummy Future'])
+    group1.updateCommitmentInfo('Adam', pot_share=30, spend_limit=100, categories=['Restaurants'])
+    group1.updateCommitmentInfo('Aditi', pot_share=100, spend_limit=1500, merchants=['TikTok Shop'])
+    group1.updateCommitmentInfo('David', pot_share=10, spend_limit=200, merchants=['Mr. Peanut'])
 
     print(f'Group ID: {group1.id}')
     print(f'Pot: {group1.pot}')
-    print(f'Are commitments valid? {group1.areCommitmentsValid()}')
-    
-    group1.updateCommitment('David', merchants=['Mr. Peanut'])
-    print(f'Are commitments valid? {group1.areCommitmentsValid()}')
+    print(f'Are commitments valid? {group1.hasValidCommitments()}')
 
 
 if __name__ == "__main__":
